@@ -1,0 +1,29 @@
+services:
+  basalt:
+    build: .
+    image: basalt:0.3.2
+    restart: unless-stopped
+    gpus: all
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./models:/models:ro
+      - ./cache:/root/.cache/basalt
+      - ./config.json:/etc/basalt.json:ro
+    secrets:
+      - basalt-api-key
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    shm_size: 2g
+    stop_grace_period: 2m
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health')"]
+      interval: 30s
+      timeout: 10s
+      start_period: 2m
+
+secrets:
+  basalt-api-key:
+    file: ./api-key

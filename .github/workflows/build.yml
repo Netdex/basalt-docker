@@ -74,6 +74,17 @@ jobs:
           docker system prune -af
           df -h /
 
+      - name: Docker DNS
+        if: steps.exists.outputs.skip != 'true'
+        # The hosted runner's resolver returns SERVFAIL for *.ubuntu.com.
+        run: |
+          conf=/etc/docker/daemon.json
+          sudo test -s $conf || echo '{}' | sudo tee $conf > /dev/null
+          sudo jq '.dns = ["1.1.1.1", "8.8.8.8"]' $conf | sudo tee $conf.new > /dev/null
+          sudo mv $conf.new $conf
+          sudo systemctl restart docker
+          docker run --rm ubuntu:24.04 getent ahosts archive.ubuntu.com
+
       - uses: docker/build-push-action@v6
         if: steps.exists.outputs.skip != 'true'
         with:

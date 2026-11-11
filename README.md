@@ -32,6 +32,19 @@ The server listens on port 8080:
 curl http://localhost:8080/v1/models -H "Authorization: Bearer $(cat api-key)"
 ```
 
+## Prebuilt images
+
+A daily workflow follows upstream releases: when a new one appears it bumps
+`BASALT_REF` here and publishes the image as
+`ghcr.io/netdex/basalt-docker:<version>` and `:latest`.
+
+```sh
+docker pull ghcr.io/netdex/basalt-docker:0.3.2
+```
+
+To use it from `compose.yaml`, replace `build: .` and `image:` with
+`image: ghcr.io/netdex/basalt-docker:0.3.2`.
+
 ## Build arguments
 
 | Argument       | Default  | Meaning                                       |

@@ -2,7 +2,7 @@
 ARG CUDA_VERSION=13.4.3
 
 FROM nvidia/cuda:${CUDA_VERSION}-devel-ubuntu24.04 AS build
-ARG BASALT_REF=v0.3.2
+ARG BASALT_REF=v0.3.3
 RUN apt-get update \
  && apt-get install -y --no-install-recommends cmake g++ make git python3 \
  && rm -rf /var/lib/apt/lists/*

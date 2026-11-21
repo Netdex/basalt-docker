@@ -39,17 +39,17 @@ A daily workflow follows upstream releases: when a new one appears it bumps
 `ghcr.io/netdex/basalt-docker:<version>` and `:latest`.
 
 ```sh
-docker pull ghcr.io/netdex/basalt-docker:0.5.0
+docker pull ghcr.io/netdex/basalt-docker:0.5.5
 ```
 
 To use it from `compose.yaml`, replace `build: .` and `image:` with
-`image: ghcr.io/netdex/basalt-docker:0.5.0`.
+`image: ghcr.io/netdex/basalt-docker:0.5.5`.
 
 ## Build arguments
 
 | Argument       | Default  | Meaning                                       |
 | -------------- | -------- | --------------------------------------------- |
-| `BASALT_REF`   | `v0.5.0` | Upstream release tag to build (`vX.Y.Z`)      |
+| `BASALT_REF`   | `v0.5.5` | Upstream release tag to build (`vX.Y.Z`)      |
 | `CUDA_VERSION` | `13.4.3` | `nvidia/cuda` base image version              |
 
 ```sh
@@ -78,7 +78,7 @@ network.
 Arguments after the image name are passed through to `serve.server`:
 
 ```sh
-docker run --gpus all ... basalt:0.5.0 --port 9000
+docker run --gpus all ... basalt:0.5.5 --port 9000
 ```
 
 The config format is documented upstream in

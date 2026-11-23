@@ -1,7 +1,7 @@
 services:
   basalt:
     build: .
-    image: basalt:0.5.5
+    image: basalt:0.5.6
     restart: unless-stopped
     gpus: all
     ports:

@@ -2,8 +2,8 @@
   "version": 2,
   "models": [
     {
-      "model": "/models/Qwen3.8-FN-GSQ-RCO-IQ3_S.basalt",
-      "alias": "flash-next-iq3_s",
+      "model": "/models/Qwen3.8-FN-UD-IQ3_XXS.basalt",
+      "alias": "flash-next-iq3_xxs",
       "gpu": "0",
       "max-context": 131072,
       "kv": "int8",

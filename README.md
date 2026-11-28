@@ -1,16 +1,19 @@
 # basalt-docker
 
 A container image for [Basalt](https://github.com/jesdga95/basalt), a local
-inference engine for mixture-of-experts models that keeps the experts that do
-not fit in VRAM in system RAM, and its OpenAI- and Anthropic-compatible server.
+inference engine that keeps what does not fit in VRAM (the experts of a
+mixture-of-experts model) in system RAM, and its OpenAI- and
+Anthropic-compatible server.
 
-The image builds Basalt from a release tag and ships the same file set as the
-upstream `linux-x64` release, on the CUDA runtime base.
+The image builds Basalt from a release tag, with every model it supports, and
+ships the same file set as the upstream `linux-x64` release, on the CUDA
+runtime base.
 
 ## Requirements
 
-- An NVIDIA GPU with compute capability 12.0 (Blackwell). Basalt builds for
-  that architecture only.
+- An x86-64 host with AVX2 and an NVIDIA Blackwell GPU with compute
+  capability 12.0. The image is built for that architecture only (upstream
+  also supports the Arm64 GB10, which this image does not).
 - A driver that supports CUDA 13.4, and the NVIDIA Container Toolkit.
 - Docker with BuildKit (the default since Docker 23).
 
@@ -50,11 +53,18 @@ To use it from `compose.yaml`, replace `build: .` and `image:` with
 | Argument       | Default  | Meaning                                       |
 | -------------- | -------- | --------------------------------------------- |
 | `BASALT_REF`   | `v0.6.0` | Upstream release tag to build (`vX.Y.Z`)      |
+| `BASALT_MODELS` | `all`   | Models to build: `all`, or a `;`-separated list of architecture ids |
 | `CUDA_VERSION` | `13.4.3` | `nvidia/cuda` base image version              |
 
 ```sh
-docker build --build-arg BASALT_REF=v0.3.1 -t basalt:0.3.1 .
+docker build --build-arg BASALT_REF=v0.5.7 -t basalt:0.5.7 .
+docker build --build-arg BASALT_MODELS=qwen4exp -t basalt:flash-next .
 ```
+
+`BASALT_MODELS` takes upstream's architecture ids (`qwen4exp` is
+Qwen3.8-Flash-Next); see upstream's
+[building](https://github.com/jesdga95/basalt/blob/master/docs/building.md#building-only-some-models)
+for the list. A smaller set builds much faster.
 
 `BASALT_REF` must be a release tag: the build packages the result with
 upstream's `tools/package_release.py`, which checks the tag against the
@@ -69,20 +79,20 @@ version in `CMakeLists.txt`.
 | `/root/.cache/basalt`  | Engine cache; keep it on a volume to skip work on restart      |
 | `BASALT_API_KEY_FILE`  | File holding the API key, default `/run/secrets/basalt-api-key` |
 
-Basalt refuses an API key in its config file and takes it only on the command
-line. The entrypoint reads it from `BASALT_API_KEY_FILE` and hands it to the
-server in-process, so it never appears in the process's command line. If the
-file is absent the server runs without a key and warns that it is open to the
-network.
+Basalt refuses an API key in its config file. The entrypoint passes
+`BASALT_API_KEY_FILE` to the server as `--api-key-file`, so the key never
+appears in the process's command line. If the file is absent the server runs
+without a key and warns that it is open to the network.
 
-Arguments after the image name are passed through to `serve.server`:
+Arguments after the image name are passed through to `basalt serve`:
 
 ```sh
 docker run --gpus all ... basalt:0.6.0 --port 9000
 ```
 
 The config format is documented upstream in
-[docs/configuration](https://github.com/jesdga95/basalt/tree/master/docs/configuration).
+[docs/configuration](https://github.com/jesdga95/basalt/tree/master/docs/configuration/index.md);
+`tools/migrations/config_v1_to_v2.py` in the image converts an older file.
 `memlock` is unlimited and `shm_size` raised in `compose.yaml` because the
 engine pins host memory for expert uploads.
 

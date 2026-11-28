@@ -1,20 +1,14 @@
 import os
-import runpy
 import sys
 
 args = [
-    "serve.server",
-    "--engine-bin", "/opt/basalt/bin/basalt",
+    "/opt/basalt/bin/basalt", "serve",
     "--config", os.environ.get("BASALT_CONFIG", "/etc/basalt.json"),
 ]
 
-# basalt accepts the API key only as --api-key on the command line. Passing it
-# in-process keeps it out of /proc/<pid>/cmdline.
+# The key stays in its file, out of the process's command line.
 key_file = os.environ.get("BASALT_API_KEY_FILE", "/run/secrets/basalt-api-key")
 if os.path.exists(key_file):
-    with open(key_file) as f:
-        args += ["--api-key", f.read().strip()]
+    args += ["--api-key-file", key_file]
 
-sys.argv = args + sys.argv[1:]
-sys.path.insert(0, "/opt/basalt")
-runpy.run_module("serve.server", run_name="__main__", alter_sys=True)
+os.execv(args[0], args + sys.argv[1:])

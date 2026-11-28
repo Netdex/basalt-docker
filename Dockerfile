@@ -8,7 +8,7 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/*
 ADD --keep-git-dir=true https://github.com/jesdga95/basalt.git#${BASALT_REF} /src
 WORKDIR /src
-RUN cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
+RUN cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBASALT_MODELS=all \
  && cmake --build build -j"$(nproc)"
 RUN python3 tools/package_release.py --tag "${BASALT_REF}" --platform linux-x64 --out /dist \
  && mkdir /opt/basalt \
